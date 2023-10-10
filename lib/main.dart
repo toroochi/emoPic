@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism_widgets/glassmorphism_widgets.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -33,6 +32,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   ScrollController _controller = ScrollController();
   double _opacity = 1.0; // 初期の不透明度
+  double _scrollThreshold = 500.0; // フェードアウトの閾値
 
   @override
   void initState() {
@@ -40,19 +40,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _controller.addListener(() {
       // スクロール位置に応じて不透明度を計算
-      double opacity = 1.0 - (_controller.offset / 500); // 100はフェードアウトが完了するまでのスクロール距離
+      double offset = _controller.offset;
 
-      // 不透明度が0未満にならないように制限
-      if (opacity < 0.0) {
-        opacity = 0.0;
+      if (offset < _scrollThreshold) {
+        double opacity = 1.0 - (offset / _scrollThreshold);
+        if (opacity < 0.0) {
+          opacity = 0.0;
+        }
+        setState(() {
+          _opacity = opacity;
+        });
+      } else {
+        setState(() {
+          _opacity = 0.0; // 閾値を超えたら不透明度を0に設定
+        });
       }
-
-      setState(() {
-        // ステートを更新して画像の不透明度を変更
-        _opacity = opacity;
-      });
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(
             fontFamily: 'eri',
             color: Colors.blue,
-            fontSize: 30
+            fontSize: 30,
           ),
         ),
       ),
@@ -74,28 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text(
                 '#エモさ定量化',
-              style: TextStyle(
+                style: TextStyle(
                   fontFamily: 'eri',
                   fontSize: 30,
-                  color: Colors.blue
+                  color: Colors.blue,
                 ),
               ),
-              onTap: (){
-
-              },
+              onTap: () {},
             ),
             ListTile(
               title: Text(
-                  '#みんなの写真広場',
-              style: TextStyle(
+                '#みんなの写真広場',
+                style: TextStyle(
                   fontFamily: 'eri',
                   fontSize: 30,
-                  color: Colors.blue
+                  color: Colors.blue,
                 ),
               ),
-              onTap: (){
-
-              },
+              onTap: () {},
             )
           ],
         ),
@@ -104,49 +105,50 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: <Widget>[
           SingleChildScrollView(
-            controller: _controller, // スクロールコントローラーを指定
+            controller: _controller,
             child: Column(
               children: <Widget>[
                 AnimatedOpacity(
-                  duration: Duration(milliseconds: 500), // フェードアニメーションの時間
-                  opacity: _opacity, // 不透明度を変更
+                  duration: Duration(milliseconds: 500),
+                  opacity: _opacity,
                   child: Image.asset(
                     'images/sky_00184.jpeg',
                   ),
                 ),
-                // ここに他のコンテンツを追加できます
                 Text(
                   '''あなたの写真のエモさを、
-                      CLIPを用いたモデルで数値として可視化します。''',
+                      CLIPを用いたモデルで数値として可視化します.''',
                   style: TextStyle(
                     fontFamily: 'eri',
                     color: Colors.blue,
-                    fontSize: 40
+                    fontSize: 40,
                   ),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                child: OutlinedButton(
-                  onPressed: ()
-                  {
-                    //画像のアップロード時の処理を書く
-                  },
-                  child: Text(
-                    '画像をアップロード',
-                    style: TextStyle(
-                      fontFamily: 'eri',
-                      fontSize: 30
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // 画像のアップロード時の処理を書く
+                    },
+                    child: Text(
+                      '画像をアップロード',
+                      style: TextStyle(
+                        fontFamily: 'eri',
+                        fontSize: 30,
+                      ),
                     ),
                   ),
                 ),
-                ),
                 SizedBox(
-                  height: 580, // スクロールさせる高さを設定
+                  height: 580,
                 ),
               ],
             ),
           ),
-          IgnorePointer(
+          AnimatedOpacity(
+            duration: Duration(milliseconds: 500),
+            opacity: _opacity,
+          child: IgnorePointer(
             ignoring: true,
             child: Align(
               alignment: Alignment.center,
@@ -155,25 +157,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 500,
                 blur: 10,
                 borderGradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.1),
-                      Colors.white.withOpacity(0.1)
-                    ]
+                  colors: [
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.1),
+                  ],
                 ),
-                  child: Padding(
+                child: Padding(
                   padding: EdgeInsets.all(25),
                   child: Text(
                     '''#あなたのエモ写を教えて。
                     #エモさの可視化''',
                     style: TextStyle(
-                        fontFamily: 'eri',
-                        color: Colors.white,
-                        fontSize: 120
+                      fontFamily: 'eri',
+                      color: Colors.white,
+                      fontSize: 120,
                     ),
                   ),
-                 ),
+                ),
               ),
             ),
+          ),
           ),
         ],
       ),
