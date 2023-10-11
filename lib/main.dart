@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism_widgets/glassmorphism_widgets.dart';
+import 'package:untitled/picture_share.dart';
 
 void main() {
   runApp(const MyApp());
@@ -85,7 +86,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                 ),
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               title: Text(
@@ -96,7 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                 ),
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AllPicPage()),
+                );
+              },
             )
           ],
         ),
@@ -126,21 +134,36 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // 画像のアップロード時の処理を書く
-                    },
-                    child: Text(
-                      '画像をアップロード',
-                      style: TextStyle(
-                        fontFamily: 'eri',
-                        fontSize: 30,
+                  heightFactor: 2,
+                  child:SizedBox(
+                    width: 200,
+                  height: 200,
+                  child: ElevatedButton(
+                    child: const Text(
+                        '''   画像を
+                        アップロード''',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 25,
+                      fontFamily: 'eri'
+                    ),),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      onPrimary: Colors.lightBlueAccent,
+                      shape: const CircleBorder(
+                        side: BorderSide(
+                          color: Colors.lightBlue,
+                          width: 1,
+                          style: BorderStyle.solid,
+                        ),
                       ),
                     ),
+                    onPressed: () {},
+                  ),
                   ),
                 ),
                 SizedBox(
-                  height: 580,
+                  height: 150,
                 ),
               ],
             ),
