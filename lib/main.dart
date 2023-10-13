@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism_widgets/glassmorphism_widgets.dart';
 import 'package:untitled/picture_share.dart';
+import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 
-void main() {
-  runApp(const MyApp());
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,//firebaseの初期化
+  );
+
+  runApp(MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +46,34 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var i = 0;
+  final _auth = FirebaseAuth.instance;
+  Uint8List? imageData;
+
   ScrollController _controller = ScrollController();
   double _opacity = 1.0; // 初期の不透明度
   double _scrollThreshold = 500.0; // フェードアウトの閾値
 
+  void uploadPicture() async {
+    try {
+      Uint8List? uint8list = await ImagePickerWeb.getImageAsBytes();//画像をバイトとしてロード
+      if (uint8list != null) {
+        var metadata = SettableMetadata(
+          contentType: "image/jpeg",
+        );
+        FirebaseStorage.instance.ref("image/sample" + i.toString()).putData(uint8list, metadata);
+        i++;
+
+        // アップロード後、ダウンロードして画像を表示
+        var imageURL = await FirebaseStorage.instance.ref("image/sample").getDownloadURL();
+        setState(() {
+          imageData = uint8list;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -158,13 +197,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () async{
+                      uploadPicture();
+                    },
                   ),
                   ),
                 ),
                 SizedBox(
                   height: 150,
                 ),
+                if (imageData != null)
+                  Image.memory( //image.memoryデータを画像に変換
+                    imageData!,
+                    width: 300, // 画像の幅を調整
+                  ),
               ],
             ),
           ),
