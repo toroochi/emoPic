@@ -58,6 +58,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '105557785013',
     projectId: 'album-f0696',
     authDomain: 'album-f0696.firebaseapp.com',
+    databaseURL: 'https://album-f0696-default-rtdb.firebaseio.com',
     storageBucket: 'album-f0696.appspot.com',
     measurementId: 'G-R4H25XBFPV',
   );

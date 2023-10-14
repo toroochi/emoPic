@@ -47,8 +47,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  var i = 0;
+  DatabaseReference ref = FirebaseDatabase.instance.ref();
+  final a = FirebaseDatabase.instance.ref();
+  int i = 0;
   final _auth = FirebaseAuth.instance;
   Uint8List? imageData;
 
@@ -201,6 +202,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     onPressed: () async{
                       uploadPicture();
+                      Uri url = Uri.parse("http://127.0.0.1:8000/items/sample" + i.toString());
+                      try {
+                      //リクエストを投げる
+                      var res = await http.get(url);
+
+                      //リクエスト結果をコンソール出力
+                      debugPrint(res.body);
+                      } catch (e) {
+                      //リクエストに失敗した場合は"error"と表示
+                      debugPrint("error");
+                      }
+                      await ref.set(i);
                     },
                   ),
                   ),
