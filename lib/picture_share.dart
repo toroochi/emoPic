@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism_widgets/glassmorphism_widgets.dart';
 import 'main.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:typed_data';
 
 class AllPicPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,28 +13,56 @@ class AllPicPage extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      home: AllPicHomePage(title: 'みんなの写真広場'), // 新しいページに遷移
     );
   }
 }
 
-class _AllPicPage extends StatefulWidget {
-  const _AllPicPage({super.key, required this.title});
+class AllPicHomePage extends StatefulWidget {
+  const AllPicHomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<_AllPicPage> createState() => _AllPicPageState();
+  State<AllPicHomePage> createState() => AllPicHomePageState();
 }
 
-class _AllPicPageState extends State<_AllPicPage>{
+class AllPicHomePageState extends State<AllPicHomePage> {
+  List<Uint8List> images = [];
 
   @override
-  Widget build(BuildContext context){
+  void initState() {
+    super.initState();
+    // Firebase Storageから画像をダウンロード
+    downloadImages();
+  }
+
+  void downloadImages() async {
+    final storage = FirebaseStorage.instance;
+    // 画像へのパス（必要に応じて変更）
+    final imagePaths = ['image/sample0', 'image/sample1', 'image/sample2'];
+
+    for (var path in imagePaths) {
+      try {
+        final image = await storage.ref(path).getData();
+        if (image != null) {
+          setState(() {
+            images.add(image);
+          });
+        }
+      } catch (e) {
+        print('Error downloading image: $e');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: GlassAppBar(
         blur: 500,
         title: Text(
-          'あなたのエモ写を定量化。',
+          'みんなの写真広場',
           style: TextStyle(
             fontFamily: 'eri',
             color: Colors.blue,
@@ -55,7 +85,7 @@ class _AllPicPageState extends State<_AllPicPage>{
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyApp()),
+                  MaterialPageRoute(builder: (context) => MyApp()), // メインページに遷移
                 );
               },
             ),
@@ -69,13 +99,35 @@ class _AllPicPageState extends State<_AllPicPage>{
                 ),
               ),
               onTap: () {
-                Navigator.pop(
-                  context
-                );
+                Navigator.pop(context); // このページに留まる
               },
             )
           ],
         ),
+      ),
+      // 他のウィジェットやコンテンツをここに追加
+      body: Center(
+      child: CarouselSlider(
+      options: CarouselOptions(
+      height: 400.0,
+      ),
+        items: images.map((imageData) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: MemoryImage(imageData),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      ),
       ),
     );
   }
