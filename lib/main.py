@@ -11,6 +11,7 @@ from firebase_admin import storage
 import io
 app = FastAPI()
 
+
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
@@ -33,9 +34,9 @@ async def read_item(item_id:str):
 
 
     # firebase の設定
-
-    cred = credentials.Certificate("/Users/yamaokana/Documents/album-f0696-firebase-adminsdk-11isn-ebf6feb5ed.json") # ここ変えて
-    default_app =firebase_admin.initialize_app(cred)
+    if not firebase_admin._apps:
+        cred = credentials.Certificate("/Users/yamaokana/Documents/album-f0696-firebase-adminsdk-11isn-ebf6feb5ed.json") # ここ変えて
+        default_app =firebase_admin.initialize_app(cred)
 
     bucket = storage.bucket("album-f0696.appspot.com")
 
@@ -58,7 +59,7 @@ async def read_item(item_id:str):
     image = preprocess(pil).unsqueeze(0).to(device)
 
     # テキストの読み込みと前処理
-    text = clip.tokenize(["chiken","milk","women"]).to(device)
+    text = clip.tokenize(["emotional","happy","sad","angry","anxious", "surprised"]).to(device)
 
     # 画像とテキストの類似度を計算
     with torch.no_grad():
@@ -69,5 +70,12 @@ async def read_item(item_id:str):
     similarity = similarity.to("cpu")
     #return(similarity)
     ret = int(similarity[0][0])
-    return{"chiken":int(similarity[0][0]),"milk":int(similarity[0][1]),"women":int(similarity[0][2])}
+    return{
+    "emotional":int(similarity[0][0]),
+    "happy":int(similarity[0][1]),
+    "sad":int(similarity[0][2]),
+    "angry":int(similarity[0][3]),
+    "anxious":int(similarity[0][4]),
+    "surprised":int(similarity[0][5])
+    }
     return {"item_id": item_id}
