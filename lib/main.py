@@ -19,6 +19,7 @@ origins = [
     "http://localhost:8080",
     "http://localhost:50482",
     "http://localhost:61098"
+    "http://localhost:60414"
 ]
 
 app.add_middleware(
@@ -35,7 +36,7 @@ async def read_item(item_id:str):
 
     # firebase の設定
     if not firebase_admin._apps:
-        cred = credentials.Certificate("/Users/yamaokana/Documents/album-f0696-firebase-adminsdk-11isn-ebf6feb5ed.json") # ここ変えて
+        cred = credentials.Certificate("/Users/kakinumayuusuke/Downloads/album-f0696-firebase-adminsdk-11isn-24684881fe.json") # ここ変えて
         default_app =firebase_admin.initialize_app(cred)
 
     bucket = storage.bucket("album-f0696.appspot.com")
@@ -70,6 +71,7 @@ async def read_item(item_id:str):
     similarity = similarity.to("cpu")
     #return(similarity)
     ret = int(similarity[0][0])
+    print(similarity)
     return{
     "emotional":int(similarity[0][0]),
     "happy":int(similarity[0][1]),
