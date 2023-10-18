@@ -66,18 +66,19 @@ async def read_item(item_id:str):
     with torch.no_grad():
         image_features = model.encode_image(image)
         text_features = model.encode_text(text)
-        similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+        similarity = (100.0 * image_features @ text_features.T)
 
     similarity = similarity.to("cpu")
     #return(similarity)
     ret = int(similarity[0][0])
     print(similarity)
+    print(file_name)
     return{
-    "emotional":int(similarity[0][0]),
-    "happy":int(similarity[0][1]),
-    "sad":int(similarity[0][2]),
-    "angry":int(similarity[0][3]),
-    "anxious":int(similarity[0][4]),
-    "surprised":int(similarity[0][5])
+    "emotional":float(similarity[0][0]),
+    "happy":float(similarity[0][1]),
+    "sad":float(similarity[0][2]),
+    "angry":float(similarity[0][3]),
+    "anxious":float(similarity[0][4]),
+    "surprised":float(similarity[0][5])
     }
     return {"item_id": item_id}

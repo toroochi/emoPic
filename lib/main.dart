@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  var ticks = [0, 2, 4, 6, 8, 10];
+  var ticks = [2000, 2400, 2800, 3200, 3600, 4000];
   late List<List<num>> data = [
     [5, 5, 5, 5, 5, 5]
   ];
@@ -253,9 +253,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           data[0][3] = (map2["angry"] ?? -1);
                           data[0][4] = (map2["anxious"] ?? -1);
                           data[0][5] = (map2["surprised"] ?? -1);
-                          for (var i = 0; i < 6; i++) {
-                            data[0][i] *= 10;
-                          }
 
                           data = data
                               .map((graph) =>
